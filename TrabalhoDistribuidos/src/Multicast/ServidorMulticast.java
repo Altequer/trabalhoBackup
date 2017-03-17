@@ -1,3 +1,4 @@
+package Multicast;
 import java.net.*;
 
 class ServidorMulticast {
@@ -30,9 +31,9 @@ class ServidorMulticast {
 				retorno = "Teste falhou".getBytes();
 			}
 			
-			pacoteEnvio = new DatagramPacket (retorno, retorno.length, pacoteRecebido.getAddress(), pacoteRecebido.getPort());
-//			socket.setTimeToLive (ttl);
-			socket.send(pacoteEnvio);
+//			pacoteEnvio = new DatagramPacket (retorno, retorno.length, pacoteRecebido.getAddress(), pacoteRecebido.getPort());
+////			socket.setTimeToLive (ttl);
+//			socket.send(pacoteEnvio);
 
 			sentence = null;
 			pacoteRecebido = null;

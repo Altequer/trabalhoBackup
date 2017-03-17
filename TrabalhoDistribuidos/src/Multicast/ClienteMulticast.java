@@ -1,5 +1,8 @@
+package Multicast;
 import java.io.*;
 import java.net.*;
+
+import TCP.ClienteTCP;
 
 class ClienteMulticast {
 
@@ -38,7 +41,11 @@ class ClienteMulticast {
 			String retorno;
 			retorno = new String(reposta.getData());
 			System.out.println(new String(reposta.getData()));
-
+			
+			ClienteTCP tcp = new ClienteTCP();
+			tcp.setNomeServidor(reposta.getAddress());
+			tcp.setNumeroPorta(reposta.getPort());
+			
 			sentence = null;
 			envio = null;
 		}
