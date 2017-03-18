@@ -12,6 +12,7 @@ import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -25,10 +26,9 @@ public class ApresentacaoCLiente extends JDialog {
 	private JTable tableArquivos;
 	private JScrollPane scrollArquivo;
 	private JPanel panelArquivo;
-	private JButton buttonFechar, buttonPesquisar, buttonSeleciona, buttonSelecionall, buttonDelete, buttonDeleteAll,
-			buttonbackup;
+	private JButton buttonFechar, buttonPesquisar, buttonDelete, buttonDeleteAll, buttonbackup;
 	private JLabel labelArquivos, labelTotalArquivos, labelinfoArquivos;
-	private ArrayList<Arquivo> arquivos = new ArrayList();
+	private ArrayList<Arquivo> arquivos = new ArrayList<>();
 
 	public ApresentacaoCLiente() {
 
@@ -47,12 +47,12 @@ public class ApresentacaoCLiente extends JDialog {
 		this.add(this.labelArquivos);
 
 		this.labelinfoArquivos = new JLabel("Total de arquivos:");
-		this.labelinfoArquivos.setBounds(10, 570, 150, 10);
+		this.labelinfoArquivos.setBounds(10, 245, 150, 10);
 		this.labelinfoArquivos.setVisible(true);
 		this.add(this.labelinfoArquivos);
 
 		this.labelTotalArquivos = new JLabel("0");
-		this.labelTotalArquivos.setBounds(30, 600, 300, 10);
+		this.labelTotalArquivos.setBounds(120, 246, 300, 10);
 		this.labelTotalArquivos.setVisible(true);
 		this.add(this.labelTotalArquivos);
 
@@ -85,7 +85,7 @@ public class ApresentacaoCLiente extends JDialog {
 		this.add(this.panelArquivo);
 
 		this.buttonPesquisar = new JButton("Pesquisar");
-		this.buttonPesquisar.setBounds(660, 35, 133, 25);
+		this.buttonPesquisar.setBounds(660, 95, 133, 25);
 		this.buttonPesquisar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent evt) {
 				buttonPesquisarActionPerformed(evt);
@@ -93,36 +93,61 @@ public class ApresentacaoCLiente extends JDialog {
 		});
 		this.add(buttonPesquisar);
 
-		this.buttonSelecionall = new JButton("Selecionar Todos");
-		this.buttonSelecionall.setBounds(660, 125, 133, 25);
-		this.add(buttonSelecionall);
-
-		this.buttonSeleciona = new JButton("Selecionar");
-		this.buttonSeleciona.setBounds(660, 65, 133, 25);
-		this.add(buttonSeleciona);
-
-		this.buttonDelete = new JButton("Deletear Todos");
-		this.buttonDelete.setBounds(660, 155, 133, 25);
+		this.buttonDelete = new JButton("Deletar");
+		this.buttonDelete.setBounds(660, 125, 133, 25);
+		this.buttonDelete.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent evt) {
+				if (arquivos.size() > 0) {
+					try {
+						arquivos.remove(tableArquivos.getSelectedRow());
+						carregaArquivoTable();
+					} catch (Exception e) {
+						JOptionPane.showMessageDialog(null, "Nenhum arquivo selecionado!!", "Atenção",
+								JOptionPane.ERROR_MESSAGE);
+					}
+				} else {
+					JOptionPane.showMessageDialog(null, "Não tem arquivos a serem deletados!!", "Atenção",
+							JOptionPane.ERROR_MESSAGE);
+				}
+			}
+		});
 		this.add(buttonDelete);
 
-		this.buttonDeleteAll = new JButton("Deletar");
-		this.buttonDeleteAll.setBounds(660, 95, 133, 25);
+		this.buttonDeleteAll = new JButton("Deletear Todos");
+		this.buttonDeleteAll.setBounds(660, 155, 133, 25);
+		this.buttonDeleteAll.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent evt) {
+				if (arquivos.size() > 0) {
+					int totalArquivos = arquivos.size();
+
+					while (totalArquivos != 0) {
+						totalArquivos--;
+						arquivos.remove(totalArquivos);
+					}
+					carregaArquivoTable();
+				} else {
+					JOptionPane.showMessageDialog(null, "Não tem arquivos a serem deletados!!", "Atenção",
+							JOptionPane.ERROR_MESSAGE);
+				}
+			}
+		});
 		this.add(this.buttonDeleteAll);
 
 		this.buttonbackup = new JButton("Backup");
 		this.buttonbackup.setBounds(660, 185, 133, 25);
 		this.add(this.buttonbackup);
 
-		// this.buttonFechar = new JButton("Fechar");
-		// this.buttonFechar.setBounds(620, 215, 133, 25);
-		// this.buttonFechar.addActionListener(new ActionListener() {
-		// public void actionPerformed(ActionEvent evt) {
-		// buttonFecharActionPerformed(evt);
-		// }
-		// });
-		// add(this.buttonFechar);
+		this.buttonFechar = new JButton("Fechar");
+		this.buttonFechar.setBounds(660, 215, 133, 25);
+		this.buttonFechar.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent evt) {
+				buttonFecharActionPerformed(evt);
+			}
+		});
+		add(this.buttonFechar);
 
-		DefaultTableModel tabelaModelo = new DefaultTableModel(null, new String[] { "Nome e caminho do arquivo", "Enviado" });
+		DefaultTableModel tabelaModelo = new DefaultTableModel(null,
+				new String[] { "Nome e caminho do arquivo", "Enviado" });
 		this.tableArquivos.setModel(tabelaModelo);
 		this.tableArquivos.getColumnModel().getColumn(0).setPreferredWidth(497);
 		this.tableArquivos.getColumnModel().getColumn(1).setPreferredWidth(140);
@@ -133,13 +158,12 @@ public class ApresentacaoCLiente extends JDialog {
 	@SuppressWarnings("unused")
 	public static void main(String[] args) {
 		ApresentacaoCLiente apresentacao = new ApresentacaoCLiente();
-		Cliente cliente = new Cliente();
-		cliente.CLienteMulticast();
+		// Cliente cliente = new Cliente();
+		// cliente.CLienteMulticast();
 	}
 
-	@SuppressWarnings("unused")
 	private void buttonFecharActionPerformed(ActionEvent evt) {
-		this.setVisible(false);
+		System.exit(0);
 	}
 
 	private void buttonPesquisarActionPerformed(ActionEvent evt) {
@@ -162,7 +186,8 @@ public class ApresentacaoCLiente extends JDialog {
 	}
 
 	public void carregaArquivoTable() {
-		DefaultTableModel tabelaModelo = new DefaultTableModel(null, new String[] { "Nome e caminho do arquivo", "Enviado" });
+		DefaultTableModel tabelaModelo = new DefaultTableModel(null,
+				new String[] { "Nome e caminho do arquivo", "Enviado" });
 		this.tableArquivos.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 
 		for (int i = 0; i < arquivos.size(); i++) {
@@ -173,14 +198,14 @@ public class ApresentacaoCLiente extends JDialog {
 
 		}
 
+		this.labelTotalArquivos.setText(String.valueOf(this.arquivos.size()));
 		this.tableArquivos.setModel(tabelaModelo);
-
 		this.tableArquivos.getColumnModel().getColumn(0).setPreferredWidth(497);
 		this.tableArquivos.getColumnModel().getColumn(1).setPreferredWidth(140);
-		
+
 		DefaultTableCellRenderer centralizado = new DefaultTableCellRenderer();
 		centralizado.setHorizontalAlignment(SwingConstants.CENTER);
-		
+
 		this.tableArquivos.getColumnModel().getColumn(1).setCellRenderer(centralizado);
 
 		this.tableArquivos.setCursor(Cursor.getDefaultCursor());
