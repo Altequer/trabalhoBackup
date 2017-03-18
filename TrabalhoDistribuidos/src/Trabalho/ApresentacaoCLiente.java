@@ -135,6 +135,11 @@ public class ApresentacaoCLiente extends JDialog {
 
 		this.buttonbackup = new JButton("Backup");
 		this.buttonbackup.setBounds(660, 185, 133, 25);
+		this.buttonbackup.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent evt) {
+				buttonBackupActionPerformed(evt);
+			}
+		});
 		this.add(this.buttonbackup);
 
 		this.buttonFechar = new JButton("Fechar");
@@ -158,8 +163,6 @@ public class ApresentacaoCLiente extends JDialog {
 	@SuppressWarnings("unused")
 	public static void main(String[] args) {
 		ApresentacaoCLiente apresentacao = new ApresentacaoCLiente();
-		// Cliente cliente = new Cliente();
-		// cliente.CLienteMulticast();
 	}
 
 	private void buttonFecharActionPerformed(ActionEvent evt) {
@@ -210,5 +213,10 @@ public class ApresentacaoCLiente extends JDialog {
 
 		this.tableArquivos.setCursor(Cursor.getDefaultCursor());
 		this.tableArquivos.requestFocus();
+	}
+
+	private void buttonBackupActionPerformed(ActionEvent evt) {
+		Cliente cliente = new Cliente();
+		cliente.CLienteMulticast();
 	}
 }

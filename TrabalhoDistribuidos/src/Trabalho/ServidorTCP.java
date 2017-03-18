@@ -1,4 +1,4 @@
-package TCP;
+package Trabalho;
 
 import java.net.*;
 import java.io.*;
@@ -17,7 +17,7 @@ public class ServidorTCP
 		String comando;
 		
 		/* Parametros */
-		numeroPorta = "9999";
+		numeroPorta = "9988";
 
 		/* Inicializacao do server socket TCP */
 		serverSocket = new ServerSocket(

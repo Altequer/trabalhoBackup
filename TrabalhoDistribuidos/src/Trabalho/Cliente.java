@@ -56,11 +56,11 @@ public class Cliente {
 
 				String retorno;
 				retorno = new String(reposta.getData());
-				System.out.println(new String(reposta.getData()));
+				System.out.println(reposta.getPort());
 
-				ClienteTCP tcp = new ClienteTCP();
-				tcp.setNomeServidor(reposta.getAddress());
-				tcp.setNumeroPorta(reposta.getPort());
+//				ClienteTCP tcp = new ClienteTCP();
+//				tcp.setNomeServidor(reposta.getAddress());
+//				tcp.setNumeroPorta(reposta.getPort());
 
 				sentence = null;
 				envio = null;

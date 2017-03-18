@@ -1,5 +1,7 @@
-package Multicast;
+package Trabalho;
+
 import java.net.*;
+import java.util.ArrayList;
 
 class ServidorMulticast {
 
@@ -25,15 +27,19 @@ class ServidorMulticast {
 			
 			System.out.println(sentence);
 			byte[] retorno;
-			if (sentence.toLowerCase().contains("teste")) {
-				retorno = "Teste efetuado com sucesso".getBytes();
+		
+			//Identifica a mensagem
+			if (sentence.toLowerCase().contains("backup")) {
+				retorno = "teste efetuado".getBytes();
 			} else {
 				retorno = "Teste falhou".getBytes();
 			}
 			
-//			pacoteEnvio = new DatagramPacket (retorno, retorno.length, pacoteRecebido.getAddress(), pacoteRecebido.getPort());
-////			socket.setTimeToLive (ttl);
-//			socket.send(pacoteEnvio);
+			pacoteEnvio = new DatagramPacket (retorno, retorno.length, pacoteRecebido.getAddress(), pacoteRecebido.getPort());
+			pacoteEnvio.setAddress(InetAddress.getByName("localhost"));
+			pacoteEnvio.setPort(9988);
+//			socket.setTimeToLive (ttl);
+			socket.send(pacoteEnvio);
 
 			sentence = null;
 			pacoteRecebido = null;
