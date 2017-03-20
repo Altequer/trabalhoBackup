@@ -216,7 +216,10 @@ public class ApresentacaoCLiente extends JDialog {
 	}
 
 	private void buttonBackupActionPerformed(ActionEvent evt) {
-		Cliente cliente = new Cliente();
-		cliente.CLienteMulticast();
+		Cliente cliente;
+		cliente = new Cliente();
+		cliente.ClienteMulticast();
+		cliente.setMensagemEnviar("Horas");
+		cliente.ClienteTCP();
 	}
 }

@@ -8,6 +8,7 @@ import java.util.Date;
 
 public class ServidorTCP 
 {
+	@SuppressWarnings("resource")
 	public static void main(String[] args) throws Exception {
 		String numeroPorta;
 		ServerSocket serverSocket;
@@ -39,10 +40,7 @@ public class ServidorTCP
 				System.out.println ("Comando recebido: ["+ comando+"]");
 				/* Se comando for "HORA" */
 				if (comando.equals ("HORA")){
-					/* Prepara a hora para envio */
-					String hora = new SimpleDateFormat("d MMM yyyy HH:mm:ss").format(new Date ());
-					/* Escreve na saida a 'hora' */
-					out.println (hora);
+					System.out.println("EEE");
 				}else if (comando.equals ("FIM")){
 					break;
 				}else{

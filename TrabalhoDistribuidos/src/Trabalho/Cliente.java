@@ -9,6 +9,8 @@ import java.net.InetAddress;
 import java.net.MulticastSocket;
 import java.net.Socket;
 
+import javax.swing.JOptionPane;
+
 import Exemplos.ClienteTCP;
 
 public class Cliente {
@@ -17,9 +19,11 @@ public class Cliente {
 	private InetAddress nomeServidor;
 	private int numeroPorta;
 	private String mensagemEnviar;
+	private String nomeServidorTCP;
+	private int numeroPortaTCP;
 
 	@SuppressWarnings("unused")
-	public void CLienteMulticast() {
+	public void ClienteMulticast() {
 		byte[] envioData, repostaDat;
 		envioData = new byte[1024];
 		repostaDat = new byte[1024];
@@ -38,12 +42,11 @@ public class Cliente {
 			BufferedReader stdIn;
 			stdIn = new BufferedReader(new InputStreamReader(System.in));
 
-			while (true) {
-				System.out.print("Mensagem: ");
-				String sentence = stdIn.readLine();
+			// while (true) {
+			String sentence = "backup";
 
-				if (sentence == null)
-					break;
+			if (sentence != null) {
+
 				envioData = sentence.getBytes();
 
 				envio = new DatagramPacket(envioData, envioData.length, endereco, porta);
@@ -54,17 +57,18 @@ public class Cliente {
 				reposta = new DatagramPacket(repostaDat, repostaDat.length);
 				clientSocket.receive(reposta);
 
-				String retorno;
-				retorno = new String(reposta.getData());
-				System.out.println(reposta.getPort());
+				String[] retorno;
+				retorno = new String(reposta.getData()).split("\n");
 
-//				ClienteTCP tcp = new ClienteTCP();
-//				tcp.setNomeServidor(reposta.getAddress());
-//				tcp.setNumeroPorta(reposta.getPort());
+				if (retorno != null && (retorno[0].toLowerCase().contains("sucesso"))) {
+					this.setNomeServidorTCP(retorno[1].trim());
+					this.setNumeroPortaTCP(retorno[2]);
+				}
 
 				sentence = null;
 				envio = null;
 			}
+			// }
 
 			clientSocket.leaveGroup(endereco);
 			clientSocket.close();
@@ -72,6 +76,22 @@ public class Cliente {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+
+	public String getNomeServidorTCP() {
+		return nomeServidorTCP;
+	}
+
+	public void setNomeServidorTCP(String nomeServidorTCP) {
+		this.nomeServidorTCP = nomeServidorTCP;
+	}
+
+	public int getNumeroPortaTCP() {
+		return numeroPortaTCP;
+	}
+
+	public void setNumeroPortaTCP(String numeroPortaTCP) {
+		this.numeroPortaTCP = new Integer(numeroPortaTCP.substring(1, 5)).intValue();
 	}
 
 	public void ClienteTCP() {
@@ -82,7 +102,7 @@ public class Cliente {
 
 		/* Inicializacao de socket TCP */
 		try {
-			socket = new Socket(getNomeServidor(), new Integer(getNumeroPorta()).intValue());
+			socket = new Socket(InetAddress.getByName(this.getNomeServidorTCP()), new Integer(getNumeroPortaTCP()).intValue());
 
 			/* Inicializacao dos fluxos de entrada e saida */
 			in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
