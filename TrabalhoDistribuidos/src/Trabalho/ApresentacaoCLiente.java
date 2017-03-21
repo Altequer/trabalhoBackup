@@ -13,6 +13,7 @@ import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
@@ -27,6 +28,7 @@ public class ApresentacaoCLiente extends JDialog {
 	private JPanel panelArquivo;
 	private JButton buttonFechar, buttonPesquisar, buttonDelete, buttonDeleteAll, buttonbackup;
 	private JLabel labelArquivos, labelTotalArquivos, labelinfoArquivos;
+	private JProgressBar barraProgresso;
 	private ArrayList<Arquivo> arquivos = new ArrayList<>();
 
 	public ApresentacaoCLiente() {
@@ -39,7 +41,19 @@ public class ApresentacaoCLiente extends JDialog {
 		this.setResizable(false);
 		this.setModal(true);
 		this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-
+		
+		
+		this.barraProgresso = new JProgressBar();
+		this.barraProgresso.setStringPainted(true);
+		this.barraProgresso.setMaximum(0);
+		this.barraProgresso.setMaximum(100);
+		this.barraProgresso.setValue(0);
+		this.barraProgresso.setBounds(200, 243, 450, 15);
+		this.barraProgresso.setForeground(Color.red);
+		this.barraProgresso.setBackground(Color.WHITE);;
+		this.add(this.barraProgresso);
+		this.barraProgresso.setVisible(true);
+		
 		this.labelArquivos = new JLabel("Arquivos Selecionados:");
 		this.labelArquivos.setBounds(10, 10, 150, 10);
 		this.labelArquivos.setVisible(true);
@@ -155,7 +169,7 @@ public class ApresentacaoCLiente extends JDialog {
 		this.tableArquivos.setModel(tabelaModelo);
 		this.tableArquivos.getColumnModel().getColumn(0).setPreferredWidth(497);
 		this.tableArquivos.getColumnModel().getColumn(1).setPreferredWidth(140);
-
+		
 		this.setVisible(true);
 	}
 
@@ -218,9 +232,13 @@ public class ApresentacaoCLiente extends JDialog {
 		Cliente cliente;
 		cliente = new Cliente();
 		cliente.ClienteMulticast();
-//		cliente.ClienteTCP();
+		this.barraProgresso.setValue(0);
+		this.barraProgresso.setVisible(true);
 		for (int i = 0; i < arquivos.size(); i++) {
-			cliente.ClienteTCP(arquivos.get(i).getArquivo());
+			if (arquivos.get(i).isEnviado().toLowerCase().contains("não enviado")) {
+				cliente.ClienteTCP(arquivos.get(i).getArquivo());
+				this.barraProgresso.setValue(i);
+			}
 			arquivos.get(i).setEnviado(true);
 			this.carregaArquivoTable();
 		}
