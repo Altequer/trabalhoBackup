@@ -2,59 +2,41 @@ package Trabalho;
 
 import java.net.*;
 import java.io.*;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
-
-public class ServidorTCP 
-{
+public class ServidorTCP {
 	@SuppressWarnings("resource")
 	public static void main(String[] args) throws Exception {
-		String numeroPorta;
-		ServerSocket serverSocket;
-		Socket clientSocket;
-		PrintWriter out;
-		BufferedReader in;
-		String comando;
-		
-		/* Parametros */
-		numeroPorta = "9988";
+		ServerSocket server = new ServerSocket(9988);
 
-		/* Inicializacao do server socket TCP */
-		serverSocket = new ServerSocket(
-				new Integer (numeroPorta).intValue());
-		
-		while (true){
-			/* Espera por um cliente */
-			clientSocket = serverSocket.accept();
-			System.out.println ("Novo cliente: "+serverSocket.toString());
+		while (true) {
+			Socket clSocket = server.accept();
+			try {
 
-			/* Preparacao dos fluxos de entrada e saida */
-			out = new PrintWriter(clientSocket.getOutputStream(),
-					true);
-			in = new BufferedReader(new InputStreamReader(
-					clientSocket.getInputStream()));
+				int bytesRead;
+				DataInputStream clientData = new DataInputStream(clSocket.getInputStream());
 
-			/* Recuperacao dos comandos */
-			while ((comando = in.readLine()) != null) {	
-				System.out.println ("Comando recebido: ["+ comando+"]");
-				/* Se comando for "HORA" */
-				if (comando.equals ("HORA")){
-					System.out.println("EEE");
-				}else if (comando.equals ("FIM")){
-					break;
-				}else{
-					out.println ("Comando Desconhecido");
+				String fileName = clientData.readUTF();
+				File caminho = new File("C:\\Backup");
+
+				if (!caminho.exists()) {
+					caminho.mkdirs();
 				}
-			}
-			/* Finaliza tudo */
-			System.out.print ("Cliente desconectando... ");
-			out.close();
-			in.close();
-			clientSocket.close();
-			System.out.println ("ok");
-		}
+				String caminhoCompleto = caminho + "/" + fileName;
 
+				OutputStream output = new FileOutputStream((caminhoCompleto));
+				long size = clientData.readLong();
+				byte[] buffer = new byte[1024];
+
+				while (size > 0
+						&& (bytesRead = clientData.read(buffer, 0, (int) Math.min(buffer.length, size))) != -1) {
+					output.write(buffer, 0, bytesRead);
+					size -= bytesRead;
+				}
+
+				output.close();
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();
+			}
+		}
 	}
 }
-		

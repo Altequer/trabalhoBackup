@@ -1,17 +1,19 @@
 package Trabalho;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedReader;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.PrintWriter;
+import java.io.OutputStream;
 import java.net.DatagramPacket;
+import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
 import java.net.Socket;
-
-import javax.swing.JOptionPane;
-
-import Exemplos.ClienteTCP;
 
 public class Cliente {
 
@@ -21,6 +23,8 @@ public class Cliente {
 	private String mensagemEnviar;
 	private String nomeServidorTCP;
 	private int numeroPortaTCP;
+	private String nomeServidorUDP;
+	private int numeroPortaUDP;
 
 	@SuppressWarnings("unused")
 	public void ClienteMulticast() {
@@ -63,6 +67,8 @@ public class Cliente {
 				if (retorno != null && (retorno[0].toLowerCase().contains("sucesso"))) {
 					this.setNomeServidorTCP(retorno[1].trim());
 					this.setNumeroPortaTCP(retorno[2]);
+					// this.setNomeServidorUDP(retorno[1].trim());
+					// this.setNumeroPortaUDP(retorno[2]);
 				}
 
 				sentence = null;
@@ -78,63 +84,88 @@ public class Cliente {
 		}
 	}
 
-	public String getNomeServidorTCP() {
-		return nomeServidorTCP;
-	}
-
-	public void setNomeServidorTCP(String nomeServidorTCP) {
-		this.nomeServidorTCP = nomeServidorTCP;
-	}
-
-	public int getNumeroPortaTCP() {
-		return numeroPortaTCP;
-	}
-
-	public void setNumeroPortaTCP(String numeroPortaTCP) {
-		this.numeroPortaTCP = new Integer(numeroPortaTCP.substring(1, 5)).intValue();
-	}
-
-	public void ClienteTCP() {
-		Socket socket;
-		BufferedReader in;
-		PrintWriter out;
-		BufferedReader inReader;
-
-		/* Inicializacao de socket TCP */
+	public void ClienteTCP(File arquivos) {
 		try {
-			socket = new Socket(InetAddress.getByName(this.getNomeServidorTCP()), new Integer(getNumeroPortaTCP()).intValue());
+			Socket socket = new Socket(this.getNomeServidorTCP(), this.getNumeroPortaTCP());
+			File myFile = new File(arquivos.toString());
+			byte[] mybytearray = new byte[(int) myFile.length()];
 
-			/* Inicializacao dos fluxos de entrada e saida */
-			in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-			out = new PrintWriter(socket.getOutputStream(), true);
+			FileInputStream fis = new FileInputStream(myFile);
+			BufferedInputStream bis = new BufferedInputStream(fis);
 
-			/* Abertura da entrada padrao */
-			inReader = new BufferedReader(new InputStreamReader(System.in));
+			DataInputStream dis = new DataInputStream(bis);
+			dis.readFully(mybytearray, 0, mybytearray.length);
 
-			System.out.print("Msg: ");
-			while ((mensagemEnviar = inReader.readLine()) != null) {
+			OutputStream os = socket.getOutputStream();
 
-				/* Envio da mensagem */
-				out.println(getMensagemEnviar());
+			DataOutputStream dos = new DataOutputStream(os);
+			dos.writeUTF(myFile.getName());
+			dos.writeLong(mybytearray.length);
+			dos.write(mybytearray, 0, mybytearray.length);
+			dos.flush();
+			
+			fis.close();
+			dis.close();
+			os.flush();
+			dos.close();
+			socket.close();
+		} catch (IOException e) {
+			System.err.println(e);
+		}
+	}
 
-				/* Recebimento da resposta do servidor */
-				String resposta = in.readLine();
-				if (resposta == null)
-					break;
+	public void ClienteUDP() {
+		DatagramSocket socket = null;
+		DatagramPacket request = null;
+		DatagramPacket reply = null;
+		int serverPort = 0;
+		byte[] buf = new byte[1024];
 
-				/* Imprime na tela o retorno */
-				System.out.println("Retornou: [" + resposta + "]");
-				System.out.print("Msg: ");
-			}
+		/* Inicializacao de sockets UDP com Datagrama */
+		try {
+			socket = new DatagramSocket();
+
+			/* Configuracao a partir dos parametros */
+			InetAddress host = InetAddress.getByName(this.getNomeServidorUDP());
+			serverPort = this.getNumeroPortaUDP();
+			byte[] m = "HORA".getBytes();
+
+			/* Criacao do Pacote Datagrama para Envio */
+			request = new DatagramPacket(m, m.length, host, serverPort);
+
+			/* Envio propriamente dito */
+			socket.send(request);
+
+			/* Preparacao do Pacote Datagrama para Recepcao */
+			reply = new DatagramPacket(buf, buf.length);
+
+			/* Recepcao do retorno */
+			socket.receive(reply);
+
+			/* Imprime na tela o retorno */
+			System.out.println("Retornou: [" + new String(reply.getData()) + "]");
 
 			/* Finaliza tudo */
-			out.close();
-			in.close();
 			socket.close();
-
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+
+	public String getNomeServidorUDP() {
+		return nomeServidorUDP;
+	}
+
+	public void setNomeServidorUDP(String nomeServidorUDP) {
+		this.nomeServidorUDP = nomeServidorUDP;
+	}
+
+	public int getNumeroPortaUDP() {
+		return numeroPortaUDP;
+	}
+
+	public void setNumeroPortaUDP(String numeroPortaUDP) {
+		this.numeroPortaUDP = new Integer(numeroPortaUDP.substring(1, 5)).intValue();
 	}
 
 	public InetAddress getNomeServidor() {
@@ -159,5 +190,21 @@ public class Cliente {
 
 	public void setMensagemEnviar(String mensagemEnviar) {
 		this.mensagemEnviar = mensagemEnviar;
+	}
+
+	public String getNomeServidorTCP() {
+		return nomeServidorTCP;
+	}
+
+	public void setNomeServidorTCP(String nomeServidorTCP) {
+		this.nomeServidorTCP = nomeServidorTCP;
+	}
+
+	public int getNumeroPortaTCP() {
+		return numeroPortaTCP;
+	}
+
+	public void setNumeroPortaTCP(String numeroPortaTCP) {
+		this.numeroPortaTCP = new Integer(numeroPortaTCP.substring(1, 5)).intValue();
 	}
 }

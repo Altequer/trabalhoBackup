@@ -19,7 +19,7 @@ public class Arquivo {
 		return this.getArquivo().getAbsolutePath();
 	}
 	
-	private File getArquivo() {
+	public File getArquivo() {
 		return arquivo;
 	}
 

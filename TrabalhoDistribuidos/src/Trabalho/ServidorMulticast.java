@@ -1,16 +1,15 @@
 package Trabalho;
 
 import java.net.*;
-import java.util.ArrayList;
 
 class ServidorMulticast {
 
-	@SuppressWarnings("resource")
+	@SuppressWarnings({ "resource", "unused" })
 	public static void main(String args[]) throws Exception {
 
 		int porta = new Integer("9999").intValue();
 		MulticastSocket socket = new MulticastSocket(porta);
-		InetAddress endereco, enderecoCliente;
+		InetAddress endereco;
 		endereco = InetAddress.getByName("224.0.0.0");
 
 		DatagramPacket pacoteEnvio, pacoteRecebido;

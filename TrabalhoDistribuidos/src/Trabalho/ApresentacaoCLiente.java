@@ -7,7 +7,6 @@ import java.awt.event.ActionListener;
 import java.io.File;
 import java.util.ArrayList;
 
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
@@ -219,7 +218,11 @@ public class ApresentacaoCLiente extends JDialog {
 		Cliente cliente;
 		cliente = new Cliente();
 		cliente.ClienteMulticast();
-		cliente.setMensagemEnviar("Horas");
-		cliente.ClienteTCP();
+//		cliente.ClienteTCP();
+		for (int i = 0; i < arquivos.size(); i++) {
+			cliente.ClienteTCP(arquivos.get(i).getArquivo());
+			arquivos.get(i).setEnviado(true);
+			this.carregaArquivoTable();
+		}
 	}
 }
