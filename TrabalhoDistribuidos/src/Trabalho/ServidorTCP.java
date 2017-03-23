@@ -37,15 +37,14 @@ public class ServidorTCP {
 							size -= bytesRead;
 						}
 
-						//output.close();
-						clSocket.close();
+						output.close();
+						
 					} catch (IOException e) {
 					}
 
 				};		
 
 			}.start();
-			
 		}
 	}
 }

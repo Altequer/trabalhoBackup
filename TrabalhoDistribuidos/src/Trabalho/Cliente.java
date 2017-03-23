@@ -23,7 +23,6 @@ public class Cliente {
 	private String mensagemEnviar;
 	private String nomeServidorTCP;
 	private int numeroPortaTCP;
-	private Socket cliente;
 
 	@SuppressWarnings("unused")
 	public void ClienteMulticast() {
@@ -73,23 +72,15 @@ public class Cliente {
 
 			clientSocket.leaveGroup(endereco);
 			clientSocket.close();
-
+			
 		} catch (IOException e) {
 			JOptionPane.showMessageDialog(null, e.getMessage() + "2");
 		}
 	}
 
-	public void NovoClienteTcp() {
+	public void ClienteTCP(File arquivos) {
 		try {
-			this.cliente = new Socket(this.getNomeServidorTCP(), this.getNumeroPortaTCP());
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-
-	public void EnviarMenssagemTCP(File arquivos) {
-		try {
-
+			Socket socket = new Socket(this.getNomeServidorTCP(), this.getNumeroPortaTCP());
 			File myFile = new File(arquivos.toString());
 			byte[] mybytearray = new byte[(int) myFile.length()];
 
@@ -99,31 +90,25 @@ public class Cliente {
 			DataInputStream dis = new DataInputStream(bis);
 			dis.readFully(mybytearray, 0, mybytearray.length);
 
-			OutputStream os = this.cliente.getOutputStream();
+			OutputStream os = socket.getOutputStream();
 
 			DataOutputStream dos = new DataOutputStream(os);
 			dos.writeUTF(myFile.getName());
 			dos.writeLong(mybytearray.length);
 			dos.write(mybytearray, 0, mybytearray.length);
 			dos.flush();
-
+			
 			fis.close();
 			dis.close();
 			os.flush();
 			dos.close();
+			socket.close();
 		} catch (IOException e) {
 			JOptionPane.showMessageDialog(null, e.getMessage() + "3");
 		}
 	}
 
-	public void FechaCliente() {
-		try {
-			this.cliente.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-
+	
 	public InetAddress getNomeServidor() {
 		return nomeServidor;
 	}

@@ -271,26 +271,21 @@ public class ApresentacaoCliente extends JDialog {
 		Cliente cliente;
 		cliente = new Cliente();
 		cliente.ClienteMulticast();
-		
-		if (cliente.getNomeServidorTCP().isEmpty() || cliente.getNumeroPortaTCP() < 0) {
-			return;
-		}
-		
-		cliente.NovoClienteTcp();
-		
+
 		containerProgresso.setVisible(true);
 		labelContainer.setText("Conectando...");
 		barraProgresso.setMinimum(0);
 		barraProgresso.setMaximum(arquivos.size());
-				
+
 		new Thread() {
+
 			@Override
 			public void run() {
 				try {
 					for (int i = 0; i < arquivos.size(); i++) {
 
 						if (arquivos.get(i).isEnviado().toLowerCase().contains("não enviado")) {
-							cliente.EnviarMenssagemTCP(arquivos.get(i).getArquivo());
+							cliente.ClienteTCP(arquivos.get(i).getArquivo());
 							ajustarTela(false);
 							labelContainer.setText("Enviando o arquivo " + arquivos.get(i).getArquivo().getName());
 							barraProgresso.setValue(i + 1);
@@ -298,11 +293,11 @@ public class ApresentacaoCliente extends JDialog {
 
 						arquivos.get(i).setEnviado(true);
 						carregaArquivoTable();
+
 						sleep(50);
 					}
 					containerProgresso.dispose();
 					ajustarTela(true);
-					cliente.FechaCliente();
 					interrupt();
 				} catch (InterruptedException e) {
 					e.printStackTrace();
@@ -314,6 +309,7 @@ public class ApresentacaoCliente extends JDialog {
 	}
 
 	public void ajustarTela(boolean opcao) {
+		
 		this.buttonbackup.setEnabled(opcao);
 		this.buttonDelete.setEnabled(opcao);
 		this.buttonDeleteAll.setEnabled(opcao);
