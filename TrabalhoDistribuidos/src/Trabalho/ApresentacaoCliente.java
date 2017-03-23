@@ -2,6 +2,7 @@ package Trabalho;
 
 import java.awt.Color;
 import java.awt.Cursor;
+import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -22,50 +23,76 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 
 @SuppressWarnings("serial")
-public class ApresentacaoCLiente extends JDialog {
+public class ApresentacaoCliente extends JDialog {
 	private JTable tableArquivos;
 	private JScrollPane scrollArquivo;
 	private JPanel panelArquivo;
 	private JButton buttonFechar, buttonPesquisar, buttonDelete, buttonDeleteAll, buttonbackup;
-	private JLabel labelArquivos, labelTotalArquivos, labelinfoArquivos;
+	private JLabel labelArquivos, labelTotalArquivos, labelinfoArquivos, labelinfoTamanho, labelTamanhoTotal;
 	private JProgressBar barraProgresso;
+	private JDialog containerProgresso;
+	private JLabel labelContainer;
 	private ArrayList<Arquivo> arquivos = new ArrayList<>();
 
-	public ApresentacaoCLiente() {
+	public ApresentacaoCliente() {
 
 		this.setLayout(null);
 		this.setTitle("Backup Online");
-		this.setSize(820, 290);
+		this.setSize(820, 300);
 		this.setLocationRelativeTo(null);
 		this.setAlwaysOnTop(false);
 		this.setResizable(false);
 		this.setModal(true);
 		this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 
+		this.containerProgresso = new JDialog();
+		this.containerProgresso.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+		this.containerProgresso.setSize(370, 73);
+		this.containerProgresso.setLayout(null);
+		this.containerProgresso.setUndecorated(true);
+		this.containerProgresso.setLocationRelativeTo(null);
+		this.containerProgresso.setAlwaysOnTop(true);
+		this.setVisible(false);
+
 		this.barraProgresso = new JProgressBar();
 		this.barraProgresso.setStringPainted(true);
 		this.barraProgresso.setValue(0);
-		this.barraProgresso.setBounds(200, 243, 450, 15);
-		this.barraProgresso.setForeground(Color.red);
+		this.barraProgresso.setBounds(10, 40, 350, 30);
+		this.barraProgresso.setForeground(Color.BLUE);
 		this.barraProgresso.setBackground(Color.WHITE);
-		;
-		this.add(this.barraProgresso);
+		this.containerProgresso.add(this.barraProgresso);
 		this.barraProgresso.setVisible(true);
 
+		this.labelContainer = new JLabel();
+		this.labelContainer.setBounds(10, 10, 600, 25);
+		this.labelContainer.setFont(new Font("Arial", Font.BOLD, 12));
+		this.containerProgresso.add(labelContainer);
+		this.labelContainer.setVisible(true);
+
 		this.labelArquivos = new JLabel("Arquivos Selecionados:");
-		this.labelArquivos.setBounds(10, 10, 150, 10);
+		this.labelArquivos.setBounds(10, 10, 150, 15);
 		this.labelArquivos.setVisible(true);
 		this.add(this.labelArquivos);
 
 		this.labelinfoArquivos = new JLabel("Total de arquivos:");
-		this.labelinfoArquivos.setBounds(10, 245, 150, 10);
+		this.labelinfoArquivos.setBounds(10, 245, 150, 25);
 		this.labelinfoArquivos.setVisible(true);
 		this.add(this.labelinfoArquivos);
 
 		this.labelTotalArquivos = new JLabel("0");
-		this.labelTotalArquivos.setBounds(120, 246, 300, 10);
+		this.labelTotalArquivos.setBounds(120, 245, 300, 25);
 		this.labelTotalArquivos.setVisible(true);
 		this.add(this.labelTotalArquivos);
+
+		this.labelinfoTamanho = new JLabel("Tamanho total:");
+		this.labelinfoTamanho.setBounds(160, 245, 150, 25);
+		this.labelinfoTamanho.setVisible(true);
+		this.add(this.labelinfoTamanho);
+
+		this.labelTamanhoTotal = new JLabel("0");
+		this.labelTamanhoTotal.setBounds(255, 245, 300, 25);
+		this.labelTamanhoTotal.setVisible(true);
+		this.add(this.labelTamanhoTotal);
 
 		this.tableArquivos = new JTable();
 		this.tableArquivos.setBounds(20, 20, 20, 20);
@@ -163,17 +190,18 @@ public class ApresentacaoCLiente extends JDialog {
 		add(this.buttonFechar);
 
 		DefaultTableModel tabelaModelo = new DefaultTableModel(null,
-				new String[] { "Nome e caminho do arquivo", "Enviado" });
+				new String[] { "Nome e caminho do arquivo", "Tamanho", "Enviado" });
 		this.tableArquivos.setModel(tabelaModelo);
-		this.tableArquivos.getColumnModel().getColumn(0).setPreferredWidth(497);
-		this.tableArquivos.getColumnModel().getColumn(1).setPreferredWidth(140);
+		this.tableArquivos.getColumnModel().getColumn(0).setPreferredWidth(390);
+		this.tableArquivos.getColumnModel().getColumn(1).setPreferredWidth(137);
+		this.tableArquivos.getColumnModel().getColumn(2).setPreferredWidth(110);
 
 		this.setVisible(true);
 	}
 
 	@SuppressWarnings("unused")
 	public static void main(String[] args) {
-		ApresentacaoCLiente apresentacao = new ApresentacaoCLiente();
+		ApresentacaoCliente apresentacao = new ApresentacaoCliente();
 	}
 
 	private void buttonFecharActionPerformed(ActionEvent evt) {
@@ -201,56 +229,95 @@ public class ApresentacaoCLiente extends JDialog {
 
 	public void carregaArquivoTable() {
 		DefaultTableModel tabelaModelo = new DefaultTableModel(null,
-				new String[] { "Nome e caminho do arquivo", "Enviado" });
+				new String[] { "Nome e caminho do arquivo", "Tamanho", "Enviado" });
 		this.tableArquivos.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+
+		long tamanhoTotal = 0;
 
 		for (int i = 0; i < arquivos.size(); i++) {
 
-			tabelaModelo.addRow(new String[] { "Nome e caminho do arquivo", "Enviado" });
+			tabelaModelo.addRow(new String[] { "Nome e caminho do arquivo", "Tamanho", "Enviado" });
 			tabelaModelo.setValueAt(arquivos.get(i).caminhoAbsoluto(), i, 0);
-			tabelaModelo.setValueAt(arquivos.get(i).isEnviado(), i, 1);
+			tabelaModelo.setValueAt(arquivos.get(i).getTamanho() + " KB", i, 1);
+			tabelaModelo.setValueAt(arquivos.get(i).isEnviado(), i, 2);
+
+			tamanhoTotal += arquivos.get(i).getTamanho();
 
 		}
 
+		this.labelTamanhoTotal.setText(tamanhoTotal + " KB");
 		this.labelTotalArquivos.setText(String.valueOf(this.arquivos.size()));
 		this.tableArquivos.setModel(tabelaModelo);
-		this.tableArquivos.getColumnModel().getColumn(0).setPreferredWidth(497);
-		this.tableArquivos.getColumnModel().getColumn(1).setPreferredWidth(140);
+		this.tableArquivos.getColumnModel().getColumn(0).setPreferredWidth(390);
+		this.tableArquivos.getColumnModel().getColumn(1).setPreferredWidth(137);
+		this.tableArquivos.getColumnModel().getColumn(2).setPreferredWidth(110);
 
 		DefaultTableCellRenderer centralizado = new DefaultTableCellRenderer();
 		centralizado.setHorizontalAlignment(SwingConstants.CENTER);
+		this.tableArquivos.getColumnModel().getColumn(2).setCellRenderer(centralizado);
 
-		this.tableArquivos.getColumnModel().getColumn(1).setCellRenderer(centralizado);
+		DefaultTableCellRenderer right = new DefaultTableCellRenderer();
+		right.setHorizontalAlignment(SwingConstants.RIGHT);
+		this.tableArquivos.getColumnModel().getColumn(1).setCellRenderer(right);
 
 		this.tableArquivos.setCursor(Cursor.getDefaultCursor());
 		this.tableArquivos.requestFocus();
 	}
 
 	private void buttonBackupActionPerformed(ActionEvent evt) {
+		this.barraProgresso.setMaximum(arquivos.size());
+		this.barraProgresso.setMinimum(0);
+
 		Cliente cliente;
 		cliente = new Cliente();
 		cliente.ClienteMulticast();
-
+		
+		if (cliente.getNomeServidorTCP().isEmpty() || cliente.getNumeroPortaTCP() < 0) {
+			return;
+		}
+		
+		cliente.NovoClienteTcp();
+		
+		containerProgresso.setVisible(true);
+		labelContainer.setText("Conectando...");
+		barraProgresso.setMinimum(0);
+		barraProgresso.setMaximum(arquivos.size());
+				
 		new Thread() {
-
 			@Override
 			public void run() {
 				try {
 					for (int i = 0; i < arquivos.size(); i++) {
+
 						if (arquivos.get(i).isEnviado().toLowerCase().contains("não enviado")) {
-							cliente.ClienteTCP(arquivos.get(i).getArquivo());
-							barraProgresso.setValue(10+i);
+							cliente.EnviarMenssagemTCP(arquivos.get(i).getArquivo());
+							ajustarTela(false);
+							labelContainer.setText("Enviando o arquivo " + arquivos.get(i).getArquivo().getName());
+							barraProgresso.setValue(i + 1);
 						}
+
 						arquivos.get(i).setEnviado(true);
 						carregaArquivoTable();
 						sleep(50);
 					}
-					destroy();
+					containerProgresso.dispose();
+					ajustarTela(true);
+					cliente.FechaCliente();
+					interrupt();
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
 			}
 
 		}.start();
+
+	}
+
+	public void ajustarTela(boolean opcao) {
+		this.buttonbackup.setEnabled(opcao);
+		this.buttonDelete.setEnabled(opcao);
+		this.buttonDeleteAll.setEnabled(opcao);
+		this.buttonFechar.setEnabled(opcao);
+		this.buttonPesquisar.setEnabled(opcao);
 	}
 }

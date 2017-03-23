@@ -9,34 +9,43 @@ public class ServidorTCP {
 		ServerSocket server = new ServerSocket(9988);
 
 		while (true) {
+			
 			Socket clSocket = server.accept();
-			try {
 
-				int bytesRead;
-				DataInputStream clientData = new DataInputStream(clSocket.getInputStream());
+			new Thread(){
+				public void run() {
 
-				String fileName = clientData.readUTF();
-				File caminho = new File("C:\\Backup");
+					try {
 
-				if (!caminho.exists()) {
-					caminho.mkdirs();
-				}
-				String caminhoCompleto = caminho + "/" + fileName;
+						int bytesRead;
+						DataInputStream clientData = new DataInputStream(clSocket.getInputStream());
 
-				OutputStream output = new FileOutputStream((caminhoCompleto));
-				long size = clientData.readLong();
-				byte[] buffer = new byte[1024];
+						String fileName = clientData.readUTF();
+						File caminho = new File("C:\\Backup");
 
-				while (size > 0
-						&& (bytesRead = clientData.read(buffer, 0, (int) Math.min(buffer.length, size))) != -1) {
-					output.write(buffer, 0, bytesRead);
-					size -= bytesRead;
-				}
+						if (!caminho.exists()) {
+							caminho.mkdirs();
+						}
+						String caminhoCompleto = caminho + "/" + fileName;
 
-				output.close();
-			} catch (FileNotFoundException e) {
-				e.printStackTrace();
-			}
+						OutputStream output = new FileOutputStream((caminhoCompleto));
+						long size = clientData.readLong();
+						byte[] buffer = new byte[1024];
+
+						while (size > 0 && (bytesRead = clientData.read(buffer, 0, (int) Math.min(buffer.length, size))) != -1) {
+							output.write(buffer, 0, bytesRead);
+							size -= bytesRead;
+						}
+
+						//output.close();
+						clSocket.close();
+					} catch (IOException e) {
+					}
+
+				};		
+
+			}.start();
+			
 		}
 	}
 }

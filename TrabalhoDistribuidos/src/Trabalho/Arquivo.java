@@ -22,6 +22,10 @@ public class Arquivo {
 	public File getArquivo() {
 		return arquivo;
 	}
+	
+	public long getTamanho(){
+		return (long) (Math.ceil(this.arquivo.length() / 1024D));
+	}
 
 	private void setArquivo(File arquivo) {
 		this.arquivo = arquivo;
